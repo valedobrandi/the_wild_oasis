@@ -12,6 +12,14 @@ interface Cabin {
     description: string;
 }
 
+type NewGuest = {
+    email: string;
+    fullName: string;
+    nationalID?: string;
+    nationality?: string;
+    countryFlag?: string;
+}
+
 function unwrap<T>(collection: { edges: { node: T }[] }) {
     return collection.edges.map(e => e.node);
 }
@@ -122,12 +130,12 @@ export async function getGuest(email: string) {
 }
 
 export async function getBooking(id: string) {
-  const data = await gql<{
-    bookingsCollection: {
-      edges: { node: any }[];
-    };
-  }>(
-    `
+    const data = await gql<{
+        bookingsCollection: {
+            edges: { node: any }[];
+        };
+    }>(
+        `
     query GetBooking($id: UUID!) {
       bookingsCollection(filter: { id: { eq: $id } }) {
         edges {
@@ -155,30 +163,30 @@ export async function getBooking(id: string) {
       }
     }
     `,
-    { id }
-  );
+        { id }
+    );
 
-  const booking = unwrapOne(data?.bookingsCollection);
+    const booking = unwrapOne(data?.bookingsCollection);
 
-  if (!booking) {
-    throw new Error('Booking could not be loaded');
-  }
+    if (!booking) {
+        throw new Error('Booking could not be loaded');
+    }
 
-  return {
-    ...booking,
-    cabins: unwrapOne(booking.cabins),
-    guests: unwrapOne(booking.guests),
-  };
+    return {
+        ...booking,
+        cabins: unwrapOne(booking.cabins),
+        guests: unwrapOne(booking.guests),
+    };
 }
 
 
 export async function getBookings(guestId: string) {
-  const data = await gql<{
-    bookingsCollection: {
-      edges: { node: any }[];
-    };
-  }>(
-    `
+    const data = await gql<{
+        bookingsCollection: {
+            edges: { node: any }[];
+        };
+    }>(
+        `
     query GetBookings($guestId: UUID!) {
       bookingsCollection(
         filter: { guestId: { eq: $guestId } }
@@ -205,10 +213,10 @@ export async function getBookings(guestId: string) {
       }
     }
     `,
-    { guestId }
-  );
+        { guestId }
+    );
 
-  return unwrap(data?.bookingsCollection) ?? [];
+    return unwrap(data?.bookingsCollection) ?? [];
 }
 
 
@@ -276,7 +284,7 @@ export async function getSettings() {
 
     const settings = unwrapOne(data.settingsCollection);
     if (!settings) throw new Error('Settings could not be loaded');
-    
+
     return settings;
 }
 
@@ -295,15 +303,27 @@ export async function getCountries() {
 /////////////
 // CREATE
 
-export async function createGuest(newGuest: unknown) {
-    const { data, error } = await supabase.from('guests').insert([newGuest]);
-
-    if (error) {
-        console.error(error);
-        throw new Error('Guest could not be created');
-    }
-
-    return data;
+export async function createGuest(newGuest: NewGuest) {
+    const data = await gql<{
+        insertIntoguestsCollection: {
+            records: any[];
+        }
+    }>(`
+        mutation CreateGuest($objects: [guestInsertInput!]!) {
+        insertIntoguestsCollection(objects: $objects) {
+                records {
+                    id
+                    email
+                    fullName
+                    nationalID
+                    nationality
+                    countryFlag
+                }
+            }
+        }
+        `,
+        { objects: [newGuest] });
+    return data.insertIntoguestsCollection.records[0];
 }
 
 export async function createBooking(newBooking: any) {

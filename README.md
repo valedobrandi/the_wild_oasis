@@ -90,10 +90,6 @@ If you add or change env variables, update this README accordingly.
 - If the app complains about missing env variables, double-check your `.env` or deployment provider settings.
 - For TypeScript/ESLint errors, run `npm run lint` and address reported issues.
 
-## License & contact
-
-This project doesn't include a license file — add one if you plan to publish or share the code. For questions, open an issue in the repository or contact the maintainer.
-
 ---
 
 ## Using the Supabase GraphQL API (gql helper)
