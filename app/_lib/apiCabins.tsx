@@ -145,15 +145,16 @@ export async function getBooking(id: string) {
             endDate
             status
             cabinId
-            # Accessing the related cabin record
+            observations
+            numGuests
+            totalPrice
             cabin {
               id
               name
               regularPrice
               discount
             }
-            # Accessing the related guest record
-            guests {
+            guest {
               id
               email
               fullName
@@ -172,11 +173,7 @@ export async function getBooking(id: string) {
         throw new Error('Booking could not be loaded');
     }
 
-    return {
-        ...booking,
-        cabins: unwrapOne(booking.cabins),
-        guests: unwrapOne(booking.guests),
-    };
+    return booking;
 }
 
 
@@ -376,23 +373,26 @@ export async function updateGuest(id: string, updatedFields: unknown) {
 
 export async function updateBooking(id: string, updatedFields: any) {
     const data = await gql<{
-        update_bookings_by_pk: any;
+        bookingsUpdateInput: 
+        Record<string, any>;
     }>(
         `
-    mutation UpdateBooking($id: UUID!, $changes: bookings_set_input!) {
-      update_bookings_by_pk(
-        pk_columns: { id: $id }
-        _set: $changes
-      ) {
-        id
-        status
-      }
+    mutation UpdateBookingStatus($id: BigInt!, $changes: bookingsUpdateInput!) {
+        updatebookingsCollection(
+            set: $changes
+            filter: { id: { eq: $id } }
+        ) {
+            records {
+            id
+            status
+            }
+        }
     }
     `,
         { id, changes: updatedFields }
     );
 
-    return data.update_bookings_by_pk;
+    return data.bookingsUpdateInput;
 }
 
 
