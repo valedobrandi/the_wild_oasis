@@ -104,42 +104,9 @@ How it works (summary)
 	- `Authorization: Bearer <SUPERBASE_KEY>`
 - The helper parses the JSON response, logs and throws when GraphQL `errors` are present, and returns `json.data` when successful.
 
-Basic query example
+SUPARBASE use the pg_graphql extension to provide GraphQL support for your database. 
+See the [Supabase GraphQL docs](https://supabase.com/docs/guides/database/graphql) for details on supported queries, mutations, filters, etc.
 
-```ts
-import { gql } from './app/_lib/superbase';
-
-const data = await gql<{
-	cabinsCollection: { edges: { node: { id: string; name: string } }[] };
-}>(`
-	query {
-		cabinsCollection {
-			edges {
-				node {
-					id
-					name
-				}
-			}
-		}
-	}
-`);
-
-console.log(data.cabinsCollection);
-```
-
-Using variables and mutations
-
-The helper accepts an optional `variables` object. Example mutation (see `createBooking` in `app/_lib/apiCabins.tsx` for a real example):
-
-```ts
-const result = await gql(`
-	mutation CreateBooking($booking: bookings_insert_input!) {
-		insert_bookings_one(object: $booking) { id startDate endDate status }
-	}
-`, { booking: newBooking });
-
-// `result` will contain the `data` field returned by GraphQL
-```
 
 TypeScript helpers
 

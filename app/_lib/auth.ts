@@ -1,6 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import NextAuth from "next-auth";
 import { createGuest, getGuest } from "./apiCabins";
+import { se } from "date-fns/locale";
 
 const authConfig = {
   providers: [
@@ -27,6 +28,17 @@ const authConfig = {
         console.error("Error in signIn callback:", error);
         return false;
       }
+    }, 
+    async session({ session, token }: any) {
+        const guest = await getGuest(session.user.email);
+        if (guest) {
+          session.user.id = guest.id;
+          session.user.fullName = guest.fullName;
+          session.user.nationalID = guest.nationalID;
+          session.user.nationality = guest.nationality;
+          session.user.countryFlag = guest.countryFlag;
+        }
+        return session;
     }
   },
   pages: {

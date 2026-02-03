@@ -1,11 +1,15 @@
 import SelectCountry from "@/app/_components/SelectCountry";
 import { UpdateProfile } from "@/app/_components/updateProfile";
+import { getGuest } from "@/app/_lib/apiCabins";
+import { auth } from "@/app/_lib/auth";
 
 export const metadata = {
   title: "Update Profile",
 };
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+  const guest = await getGuest(session?.user?.email!);
   const nationality = "portugal";
   return (
     <div>
@@ -18,7 +22,7 @@ export default function Page() {
         faster and smoother. See you soon!
       </p>
 
-      <UpdateProfile >
+      <UpdateProfile guest={guest}>
         <SelectCountry
           name="nationality"
           id="nationality"

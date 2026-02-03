@@ -1,4 +1,4 @@
-import { eachDayOfInterval } from 'date-fns';
+import { eachDayOfInterval, set } from 'date-fns';
 import supabase, { gql } from './superbase';
 import { notFound } from 'next/navigation';
 
@@ -300,9 +300,6 @@ export async function getCountries() {
     }
 }
 
-/////////////
-// CREATE
-
 export async function createGuest(newGuest: NewGuest) {
     const data = await gql<{
         insertIntoguestsCollection: {
@@ -349,18 +346,32 @@ export async function createBooking(newBooking: any) {
 
 // The updatedFields is an object which should ONLY contain the updated data
 export async function updateGuest(id: string, updatedFields: unknown) {
-    const { data, error } = await supabase
-        .from('guests')
-        .update(updatedFields)
-        .eq('id', id)
-        .select()
-        .single();
-
-    if (error) {
-        console.error(error);
-        throw new Error('Guest could not be updated');
+    const data = await gql<{
+        updateguestsCollection: {
+            records: any[];
+        };
+    }>(
+        `
+    mutation UpdateGuest($set: questUpdateInput!, $filter: guestFilter!) {
+      updateguestsCollection(
+        set: $set
+        filter: $filter
+      ) {
+        records {
+            nationalID
+            nationality
+            countryFlag
+        }
+      }
     }
-    return data;
+    `,
+        {
+            set: updatedFields,
+            filter: { id: { eq: id } },
+        }
+    );
+
+    return data.updateguestsCollection.records[0];
 }
 
 export async function updateBooking(id: string, updatedFields: any) {
