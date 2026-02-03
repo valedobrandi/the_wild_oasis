@@ -397,15 +397,22 @@ export async function updateBooking(id: string, updatedFields: any) {
 
 
 export async function deleteBooking(id: string) {
-    await gql(
+    const data = await gql<{
+        deleteFrombookingsCollection: {
+            records: { id: string }[];
+        };
+    }>(
         `
-    mutation DeleteBooking($id: UUID!) {
-      delete_bookings_by_pk(id: $id) {
-        id
-      }
+    mutation DeleteBooking($filter: bookingsFilter!) {
+        deleteFrombookingsCollection(filter: $filter) {
+            records {
+            id
+            }
+        }
     }
     `,
-        { id }
+        { filter: { id: { eq: id } } }
     );
+    return data.deleteFrombookingsCollection;
 }
 

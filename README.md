@@ -87,10 +87,21 @@ If you add or change env variables, update this README accordingly.
 
 ## Troubleshooting
 
-- If the app complains about missing env variables, double-check your `.env` or deployment provider settings.
+- If the app complains about missing env variables, double-check your `.env.local` or deployment provider settings.
 - For TypeScript/ESLint errors, run `npm run lint` and address reported issues.
 
----
+## Loading Hook for Form Status
+updateProfile.tsx 72: 
+
+useFormStatus is a React hook provided by the React DOM library that allows you to track the status of a form submission.
+It must be used inside a form to track the submission status.
+
+## NextJs Server Components
+app/_lib/actions.tsx 36:
+
+**revalidatePath** is a function provided by Next.js that allows you to programmatically revalidate a specific path in your application. This is particularly useful in server components when you want to ensure that the data displayed on a page is up-to-date without having to wait for the next automatic revalidation cycle.
+
+When you call **revalidatePath** with a specific path, Next.js will mark that path as needing to be revalidated. The next time a request is made to that path, Next.js will fetch fresh data and regenerate the page, ensuring that users see the most current information.
 
 ## Using the Supabase GraphQL API (gql helper)
 

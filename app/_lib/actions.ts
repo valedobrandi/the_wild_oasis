@@ -1,6 +1,7 @@
 "use server";
 
-import { updateGuest } from "./apiCabins";
+import { revalidatePath } from "next/cache";
+import { deleteBooking, updateGuest } from "./apiCabins";
 import { auth, signIn, signOut } from "./auth";
 
 export async function singInAction() {
@@ -31,4 +32,18 @@ export async function updateProfileAction(data: FormData) {
         nationality,
         countryFlag
     });
+
+    revalidatePath("/account/profile");
+}
+
+export async function deleteReservationAction(bookingId: string) {
+    const session = await auth();
+
+    if (!session || !session.user) {
+        throw new Error("Not authenticated");
+    }
+
+    await deleteBooking(bookingId);
+
+    revalidatePath("/account/reservations");
 }

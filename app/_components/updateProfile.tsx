@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { updateProfileAction } from "../_lib/actions";
+import { useFormStatus } from "react-dom";
+import Spinner from "./Spinner";
 
 type Guest = {
     id: string;
@@ -13,8 +15,6 @@ type Guest = {
 };
 
 export function UpdateProfile({ children, guest }: { children: React.ReactNode; guest: Guest }) {
-
-
     const { fullName, email, countryFlag } = guest;
 
     return (
@@ -42,7 +42,7 @@ export function UpdateProfile({ children, guest }: { children: React.ReactNode; 
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <label htmlFor="nationality">Where are you from?</label>
-                    <div className="flex-1 relative">
+                    <div className="relative flex-0 shrink-0 w-8 h-5">
                         <Image
                             src={countryFlag || "/logo.png"}
                             fill
@@ -64,10 +64,21 @@ export function UpdateProfile({ children, guest }: { children: React.ReactNode; 
             </div>
 
             <div className="flex justify-end items-center gap-6">
-                <button className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
-                    Update profile
-                </button>
+                <Button />
             </div>
         </form>
+    )
+}
+
+function Button() {
+    const { pending } = useFormStatus();
+    return (
+        <button
+        disabled={pending}
+        className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold 
+        hover:bg-accent-600 transition-all disabled:cursor-not-allowed
+         disabled:bg-gray-500 disabled:text-gray-300">
+            {pending ? "Updating" : "Update profile"}
+        </button>
     )
 }
