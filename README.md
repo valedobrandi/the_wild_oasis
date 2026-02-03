@@ -90,6 +90,12 @@ If you add or change env variables, update this README accordingly.
 - If the app complains about missing env variables, double-check your `.env.local` or deployment provider settings.
 - For TypeScript/ESLint errors, run `npm run lint` and address reported issues.
 
+## Loading State with useTransition
+app/_components/DeleteReservation.tsx 12, 18:
+
+In this code snippet, the `useTransition` hook from React is used to manage a loading state when deleting a reservation.
+Wrapping the delete action inside `startTransition` allows React to prioritize rendering updates, providing a smoother user experience during asynchronous operations.
+
 ## Loading Hook for Form Status
 updateProfile.tsx 72: 
 

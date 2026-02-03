@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { deleteBooking, updateGuest } from "./apiCabins";
+import { deleteBooking, getBookings, updateGuest } from "./apiCabins";
 import { auth, signIn, signOut } from "./auth";
 
 export async function singInAction() {
@@ -41,6 +41,13 @@ export async function deleteReservationAction(bookingId: string) {
 
     if (!session || !session.user) {
         throw new Error("Not authenticated");
+    }
+
+    const guestBookings = await getBookings(session.user.id!);
+    const bookingIds = guestBookings.map(booking => booking.id);
+
+    if (!bookingIds.includes(bookingId)) {
+        throw new Error("You are not allowed to delete this booking");
     }
 
     await deleteBooking(bookingId);
